@@ -1,0 +1,64 @@
+networks:
+  gout-network:
+    name: gout-network
+
+volumes:
+  gout-pgdata:
+    name: gout-pgdata
+
+services:
+  proxy:
+    image: traefik:v3.7
+    container_name: gout-traefik
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./infra/traefik:/etc/traefik:ro
+    networks:
+      - gout-network
+  db:
+    image: postgres:18-alpine
+    container_name: gout-db
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      start_period: 20s
+      interval: 30s
+      retries: 5
+      timeout: 5s
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      GOUT_DB_USER: ${GOUT_DB_USER}
+      GOUT_DB_PASSWORD: ${GOUT_DB_PASSWORD}
+    volumes:
+      - gout-pgdata:/var/lib/postgresql/data
+      - ./infra/postgres:/docker-entrypoint-initdb.d:ro
+    networks:
+      - gout-network
+  auth:
+    image: ghcr.io/goauthentik/server:2026.5
+    container_name: gout-auth
+    restart: unless-stopped
+    command: start
+    environment:
+      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY}
+      AUTHENTIK_POSTGRESQL__USER: ${POSTGRES_USER}
+      AUTHENTIK_POSTGRESQL__NAME: ${POSTGRES_DB}
+      AUTHENTIK_POSTGRESQL__PASSWORD: ${POSTGRES_PASSWORD}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.authentik.rule=Host(`auth.${DOMAIN}`)"
+      - "traefik.http.routers.authentik.entrypoints=web"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - gout-network
