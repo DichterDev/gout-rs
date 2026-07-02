@@ -1,10 +1,6 @@
 .env*
 !.env.example
 
-# Added by cargo
-
-/target
-
 # ===
 # OS
 # ===
@@ -70,5 +66,3 @@ Log.txt
 .netrwhist
 tags
 tpdir/
-
-
