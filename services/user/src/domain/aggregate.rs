@@ -1,30 +1,20 @@
-use crate::domain::event::{self, UserEvent, UserEventPayload};
+use crate::domain::event::{UserEvent, UserEventPayload};
 
-struct NewUser {
-    name: String,
-    password: String,
-}
-
-struct User {
+pub struct User {
     id: String,
     name: String,
     password: String,
+    is_active: bool,
     events: Vec<UserEvent>,
-}
-
-struct DeactivatedUser {
-    id: String,
-    name: String,
-    password: String,
 }
 
 impl User {
     pub fn rename(&mut self, name: String) {
-        let old_name = std::mem::replace(&mut self.name, name.clone());
-
-        if old_name == name {
+        if self.name == name {
             return;
         }
+
+        let old_name = std::mem::replace(&mut self.name, name.clone());
 
         let event = UserEvent {
             user_id: self.id.clone(),
@@ -37,20 +27,21 @@ impl User {
         self.events.push(event)
     }
 
-    pub fn deactivate(mut self) -> (DeactivatedUser, Vec<UserEvent>) {
+    pub fn deactivate(&mut self) {
+        if !self.is_active {
+            return;
+        }
+
+        self.is_active = false;
+
         let event = UserEvent {
             user_id: self.id.clone(),
             payload: UserEventPayload::UserDeactivated,
         };
-
-        let user = DeactivatedUser {
-            id: self.id,
-            name: self.name,
-            password: self.password,
-        };
-
         self.events.push(event);
+    }
 
-        (user, self.events)
+    pub fn pull_events(&mut self) -> Vec<UserEvent> {
+        std::mem::take(&mut self.events)
     }
 }
