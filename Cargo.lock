@@ -3,5 +3,17 @@
 version = 4
 
 [[package]]
-name = "gout-rs"
+name = "gateway"
+version = "0.1.0"
+
+[[package]]
+name = "order"
+version = "0.1.0"
+
+[[package]]
+name = "product"
+version = "0.1.0"
+
+[[package]]
+name = "user"
 version = "0.1.0"
