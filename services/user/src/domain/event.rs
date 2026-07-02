@@ -1,12 +1,11 @@
-enum UserEventPayload {
-    UserLoggedIn,
-    UserRegistered { name: String },
+pub enum UserEventPayload {
+    UserRegistered { name: String, password: String },
     UserRenamed { old_name: String, new_name: String },
     UserPasswordChanged,
     UserDeactivated,
 }
 
-struct UserEvent {
-    user_id: String,
-    payload: UserEventPayload,
+pub struct UserEvent {
+    pub user_id: String,
+    pub payload: UserEventPayload,
 }
