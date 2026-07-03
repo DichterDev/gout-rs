@@ -1,7 +1,9 @@
+use sqlx::types::Uuid;
+
 use crate::domain::event::{UserEvent, UserEventPayload};
 
 pub struct User {
-    id: String,
+    id: Uuid,
     name: String,
     password: String,
     is_active: bool,
@@ -21,7 +23,7 @@ impl Default for User {
 }
 
 impl User {
-    pub fn reconstruct(id: String, name: String, password: String, is_active: bool) -> User {
+    pub fn reconstruct(id: Uuid, name: String, password: String, is_active: bool) -> User {
         Self {
             id,
             name,
@@ -39,7 +41,7 @@ impl User {
         let old_name = std::mem::replace(&mut self.name, name.clone());
 
         let event = UserEvent {
-            user_id: self.id.clone(),
+            user_id: self.id.to_string(),
             payload: UserEventPayload::UserRenamed {
                 old_name,
                 new_name: name,
@@ -57,7 +59,7 @@ impl User {
         self.is_active = false;
 
         let event = UserEvent {
-            user_id: self.id.clone(),
+            user_id: self.id.to_string(),
             payload: UserEventPayload::UserDeactivated,
         };
         self.events.push(event);
@@ -67,8 +69,8 @@ impl User {
         std::mem::take(&mut self.events)
     }
 
-    pub fn id(&self) -> &str {
-        &self.id
+    pub fn id(&self) -> Uuid {
+        self.id
     }
     pub fn name(&self) -> &str {
         &self.name

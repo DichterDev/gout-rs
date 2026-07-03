@@ -1,7 +1,10 @@
+use sqlx::types::Uuid;
+
 use crate::domain::aggregate::User;
 
+#[derive(sqlx::FromRow)]
 pub struct UserEntity {
-    id: String,
+    id: Uuid,
     name: String,
     password: String,
     is_active: bool,
@@ -10,7 +13,7 @@ pub struct UserEntity {
 impl From<&User> for UserEntity {
     fn from(user: &User) -> Self {
         Self {
-            id: user.id().to_string(),
+            id: user.id(),
             name: user.name().to_string(),
             password: user.password().to_string(),
             is_active: user.is_active(),
