@@ -5,6 +5,6 @@ pub enum RepositoryError {
 }
 
 pub trait UserRepository {
-    fn get_by_id(&self, id: String) -> Result<Option<User>, RepositoryError>;
-    fn save(&self, user: &User) -> Result<(), RepositoryError>;
+    async fn get_by_id(&self, id: String) -> Result<Option<User>, RepositoryError>;
+    async fn save(&self, user: &User) -> Result<(), RepositoryError>;
 }

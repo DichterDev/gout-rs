@@ -8,7 +8,29 @@ pub struct User {
     events: Vec<UserEvent>,
 }
 
+impl Default for User {
+    fn default() -> Self {
+        Self {
+            id: Default::default(),
+            name: Default::default(),
+            password: Default::default(),
+            is_active: Default::default(),
+            events: Default::default(),
+        }
+    }
+}
+
 impl User {
+    pub fn reconstruct(id: String, name: String, password: String, is_active: bool) -> User {
+        Self {
+            id,
+            name,
+            password,
+            is_active,
+            ..Default::default()
+        }
+    }
+
     pub fn rename(&mut self, name: String) {
         if self.name == name {
             return;
@@ -43,5 +65,18 @@ impl User {
 
     pub fn pull_events(&mut self) -> Vec<UserEvent> {
         std::mem::take(&mut self.events)
+    }
+
+    pub fn id(&self) -> &str {
+        &self.id
+    }
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+    pub fn password(&self) -> &str {
+        &self.password
+    }
+    pub fn is_active(&self) -> bool {
+        self.is_active
     }
 }
