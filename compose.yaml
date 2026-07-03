@@ -39,7 +39,7 @@ services:
       GOUT_DB_USER: ${GOUT_DB_USER}
       GOUT_DB_PASSWORD: ${GOUT_DB_PASSWORD}
     volumes:
-      - gout-pgdata:/var/lib/postgresql/data
+      - gout-pgdata:/var/lib/postgresql
       - ./infra/postgres:/docker-entrypoint-initdb.d:ro
     networks:
       - gout-network

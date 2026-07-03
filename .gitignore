@@ -1,6 +1,8 @@
 .env*
 !.env.example
 
+config.yml
+
 # ==
 # CARGO
 # ===
